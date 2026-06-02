@@ -1,18 +1,68 @@
 [project]
-name = "scrapper-agent"
-version = "0.1.0"
-description = "AI agent that scrapes and analyzes company reviews from Google and other sites"
+name = "review-intel"
+version = "2.0.0-alpha"
+description = "WABA & SaaS customer intelligence platform — generate high-confidence product insights from review data"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    # Web framework
     "fastapi>=0.115.0",
     "uvicorn[standard]>=0.30.0",
+
+    # Browser automation
     "playwright>=1.48.0",
+
+    # Vector store
     "chromadb>=0.5.0",
     "sentence-transformers>=3.0.0",
+
+    # UI
     "gradio>=5.0.0",
+
+    # LLM providers
     "openai>=1.50.0",
     "anthropic>=0.40.0",
+
+    # Data validation & config
     "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
+
+    # Raw store
+    "aiosqlite>=0.20.0",
+
+    # PDF reports
     "fpdf2>=2.8.0",
+
+    # Language detection
+    "langdetect>=1.0.9",
+
+    # Environment
+    "python-dotenv>=1.0.0",
 ]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=5.0.0",
+    "ruff>=0.5.0",
+    "mypy>=1.10.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+pythonpath = ["src"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+plugins = ["pydantic.mypy"]

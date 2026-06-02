@@ -8,3 +8,26 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Data
+chroma_data/
+data/
+*.db
+
+# Environment
+.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+
+# Scratch files
+scratch*.py
+test*.pdf
+
+# Artifacts
+*.pyc
