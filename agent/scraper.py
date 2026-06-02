@@ -243,8 +243,7 @@ async def scrape_generic_reviews(browser: HumanBrowser, url: str, max_reviews: i
                 browser.page.evaluate("""
                     () => {
                         const candidates = document.querySelectorAll(
-                            'p, .review-text, .review-content, [class*="review"], [class*="Review"], '
-                            '[data-testid*="review"], [itemprop="reviewBody"], q, blockquote'
+                            'p, .review-text, .review-content, [class*="review"], [class*="Review"], [data-testid*="review"], [itemprop="reviewBody"], q, blockquote'
                         );
                         const seen = new Set();
                         const out = [];
@@ -273,17 +272,18 @@ async def scrape_generic_reviews(browser: HumanBrowser, url: str, max_reviews: i
                     '.next-page', '.load-more', '.see-more',
                     '[aria-label*="Load more"]',
                 ]
-                await asyncio.wait_for(
-                    browser.page.evaluate(f"""
-                        () => {{
-                            const sel = '{", ".join(next_clicks)}';
-                            const btn = document.querySelector(sel);
-                            if (btn) {{ btn.click(); return true; }}
-                            return false;
-                        }}
-                    """),
-                    timeout=5,
-                )
+                clicked = False
+                for btn_sel in next_clicks:
+                    try:
+                        locator = browser.page.locator(btn_sel).first
+                        if await locator.count() > 0 and await locator.is_visible():
+                            await locator.click(timeout=3000)
+                            clicked = True
+                            break
+                    except Exception:
+                        continue
+                if not clicked:
+                    break
                 await browser.wait_random(1.0, 2.0)
             except Exception:
                 break
@@ -427,20 +427,18 @@ async def _scrape_known_site(browser: HumanBrowser, url: str, max_reviews: int =
                     '.next-page', '.load-more', '.see-more',
                     '[aria-label*="Load more"]',
                 ]
+                clicked = False
                 for btn_sel in next_btns:
-                    clicked = await asyncio.wait_for(
-                        browser.page.evaluate(f"""
-                            () => {{
-                                const btn = document.querySelector('{btn_sel}');
-                                if (btn) {{ btn.click(); return true; }}
-                                return false;
-                            }}
-                        """),
-                        timeout=5,
-                    )
-                    if clicked:
-                        await browser.wait_random(1.0, 2.0)
-                        break
+                    try:
+                        locator = browser.page.locator(btn_sel).first
+                        if await locator.count() > 0 and await locator.is_visible():
+                            await locator.click(timeout=3000)
+                            clicked = True
+                            break
+                    except Exception:
+                        continue
+                if clicked:
+                    await browser.wait_random(1.0, 2.0)
                 else:
                     break
             except Exception:
